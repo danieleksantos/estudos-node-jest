@@ -1,5 +1,6 @@
 export const database = [
     "Dani",
     "Thais",
-    "Meg"
+    "Meg",
+    "Maria"
 ]

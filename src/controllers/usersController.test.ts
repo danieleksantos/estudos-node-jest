@@ -1,13 +1,43 @@
-import { describe, it, expect } from '@jest/globals';
+import { makeMockResponse } from "../mocks/mockResponse.js";
+import { UsersController } from "./usersController.js";
+import type { Request } from "express";
 
 describe('Users Controller', () => {
-  it('Deve somar 1 + 1', () => {
-    function soma(a:number, b:number) {
-      return a + b
+  const usersController = new UsersController();
+
+  const mockRequest = {} as Request
+  const mockResponse = makeMockResponse()
+
+  it('Deve listar os usuários cadastrados', ()=>{
+    usersController.listarUsuario(mockRequest, mockResponse)
+
+    expect(mockResponse.state.status).toBe(200)
+    expect(mockResponse.state.json).toHaveLength(4)
+  })
+
+  it('Deve criar um novo usuário', ()=>{
+     mockRequest.body = {
+      name: 'Mario'
     }
+    usersController.criarUsuario(mockRequest, mockResponse)
+   
+    expect(mockResponse.state.status).toBe(201)
+    expect(mockResponse.state.json).toMatchObject({
+      'mensagem': `Usuário Mario criado.` 
+    })
+  })
 
-    const resultado = soma(1,2)
 
-    expect(resultado).toBe(3)
-  });
-});
+  it('Não deve criar um usuário com o nome em branco', ()=>{
+    mockRequest.body = {
+      name: ''
+    }
+    
+    usersController.criarUsuario(mockRequest, mockResponse)
+
+    expect(mockResponse.state.status).toBe(403)
+    expect(mockResponse.state.json).toMatchObject({
+      mesagem: 'Não é possível criar usuário sem um nome'
+    })
+  })
+})
